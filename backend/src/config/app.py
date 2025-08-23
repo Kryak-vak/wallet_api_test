@@ -20,6 +20,6 @@ class AppConfig(BaseSettings):
     enviroment: Literal["local", "staging", "production"] = "local"
 
     project_name: str
-    
+
     first_superuser: str
     first_superuser_password: str

@@ -31,6 +31,7 @@ fix = true
 exclude = [
     "migrations/",
     "src/app/infrastracture/database/migrations.py",
+    "**/__init__.py",
 ]
 
 
@@ -43,6 +44,7 @@ strict = true
 exclude = [
     "migrations/",
     "src/app/infrastracture/database/migrations.py",
+    "**/__init__.py",
 ]
 
 

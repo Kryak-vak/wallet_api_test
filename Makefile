@@ -1,11 +1,9 @@
 format:
-	$(DOCKER_RUN) \
 	uv run ruff format backend/src/
 
-check:	
-	$(DOCKER_RUN) \
-	uv run ruff check src/ main.py;
-	uv run mypy src/ main.py
+check:
+	uv run ruff check backend/src/
+	uv run mypy backend/src/
 
 pip_fix:
 	.\backend\.venv\Scripts\python.exe -m ensurepip --upgrade

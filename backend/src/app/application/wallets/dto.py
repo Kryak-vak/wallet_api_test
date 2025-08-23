@@ -11,4 +11,3 @@ class WalletCreateDTO(BaseModel):
 
 class WalletUpdateDTO(BaseModel):
     pass
-

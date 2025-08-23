@@ -10,8 +10,8 @@ from src.app.infrastructure.database.base.models import ModelType
 
 
 class AbstractSQLAlchemyRepository(
-        ABC, Generic[ModelType, ReadDTOType, CreateDTOType, UpdateDTOType]
-    ):
+    ABC, Generic[ModelType, ReadDTOType, CreateDTOType, UpdateDTOType]
+):
     model: type[ModelType]
     read_dto: type[ReadDTOType]
 
@@ -44,7 +44,7 @@ class AbstractSQLAlchemyRepository(
 
         if with_related:
             stmt = self._apply_loader_options(stmt)
-        
+
         result = await self._session.scalars(stmt)
         model_instance = result.one_or_none()
 
@@ -55,17 +55,14 @@ class AbstractSQLAlchemyRepository(
 
         if with_related:
             stmt = self._apply_loader_options(stmt)
-        
+
         result = await self._session.scalars(stmt)
-        return [
-            self._to_dto(instance)
-            for instance in result.all()
-        ]
+        return [self._to_dto(instance) for instance in result.all()]
 
     async def delete(self, pk: int | UUID) -> None:
         stmt = delete(self.model).where(self.model.id == pk)  # type: ignore[attr-defined]
         await self._session.execute(stmt)
-    
+
     def _to_dto(self, model: ModelType, from_attributes: bool = True) -> ReadDTOType:
         return self.read_dto.model_validate(model, from_attributes=from_attributes)
 

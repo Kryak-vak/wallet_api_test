@@ -12,14 +12,9 @@ from src.app.infrastructure.database.wallets.models import Wallet
 
 
 class SQLAlchemyWalletRepository(
-        AbstractSQLAlchemyRepository[
-            Wallet,
-            WalletDTO,
-            WalletCreateDTO,
-            WalletUpdateDTO
-        ],
-        IWalletRepository
-    ):
+    AbstractSQLAlchemyRepository[Wallet, WalletDTO, WalletCreateDTO, WalletUpdateDTO],
+    IWalletRepository,
+):
     model = Wallet
     read_dto = WalletDTO
 

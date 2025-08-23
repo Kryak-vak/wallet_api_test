@@ -9,12 +9,8 @@ from src.config.app import ENV_FILE
 
 
 class DatabaseConfig(BaseSettings):
-    model_config = SettingsConfigDict(
-        env_prefix="POSTGRES_",
-        env_file=ENV_FILE,
-        extra="ignore"
-    )
-    
+    model_config = SettingsConfigDict(env_prefix="POSTGRES_", env_file=ENV_FILE, extra="ignore")
+
     host: str
     port: int = 5432
     user: str
@@ -25,14 +21,16 @@ class DatabaseConfig(BaseSettings):
     @property
     def SQLALCHEMY_DATABASE_URI(self) -> PostgresDsn:
         return PostgresDsn(
-            str(MultiHostUrl.build(
-                scheme="postgresql+asyncpg",
-                username=self.user,
-                password=self.password,
-                host=self.host,
-                port=self.port,
-                path=self.db,
-            ))
+            str(
+                MultiHostUrl.build(
+                    scheme="postgresql+asyncpg",
+                    username=self.user,
+                    password=self.password,
+                    host=self.host,
+                    port=self.port,
+                    path=self.db,
+                )
+            )
         )
 
 

@@ -10,7 +10,7 @@ class Wallet(Base):
     __tablename__ = "wallets"
 
     id: Mapped[UUID] = mapped_column(default=uuid4, primary_key=True)
-    
+
     operations: Mapped[list["Operation"]] = relationship(
         back_populates="wallet", cascade="all, delete-orphan"
     )
@@ -24,7 +24,7 @@ class Operation(BaseTimeStamped):
 
     id: Mapped[UUID] = mapped_column(default=uuid4, primary_key=True)
     wallet_id: Mapped[UUID] = mapped_column(ForeignKey("wallets.id"))
-    
+
     wallet: Mapped["Wallet"] = relationship(back_populates="operations")
 
     def __repr__(self):
