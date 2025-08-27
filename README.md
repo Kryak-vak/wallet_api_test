@@ -21,6 +21,8 @@
 - SQLAlchemy
 - asyncpg
 
+---
+
 ## POST `/api/v1/wallets/{wallet_id}/operation`
 
 Принимает JSON следующего формата:
