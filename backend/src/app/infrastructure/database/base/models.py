@@ -1,11 +1,13 @@
 from datetime import datetime
-from typing import TypeVar
+from uuid import UUID, uuid4
 
 from sqlalchemy import DateTime, MetaData, func
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 
 
 class Base(DeclarativeBase):
+    id: Mapped[UUID] = mapped_column(default=uuid4, primary_key=True)
+
     metadata = MetaData(
         naming_convention={
             "ix": "ix_%(column_0_label)s",
@@ -26,6 +28,3 @@ class BaseTimeStamped(Base):
     updated_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), onupdate=func.now(), nullable=True
     )
-
-
-ModelType = TypeVar("ModelType", bound=Base)

@@ -1,0 +1,28 @@
+services:
+    web:
+        build: ./backend
+        container_name: wallet_api-web-1
+
+        volumes:
+            - ./.env:/app/.env
+
+        ports:
+            - "8000:8000"
+
+        env_file:
+            - ./.env
+            - ./backend/.env
+
+        develop:
+            # Create a `watch` configuration to update the app
+            watch:
+                # Sync the working directory with the `/app` directory in the container
+                - action: sync
+                  path: ./backend/src
+                  target: /app/src/
+                  ignore:
+                      - .venv/
+
+                # Rebuild the image if dependencies change by checking uv.lock
+                - action: rebuild
+                  path: ./backend/uv.lock

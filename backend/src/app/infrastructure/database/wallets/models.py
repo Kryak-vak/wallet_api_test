@@ -1,9 +1,10 @@
+from decimal import Decimal
 from uuid import UUID, uuid4
 
-from sqlalchemy import DECIMAL, ForeignKey
+from sqlalchemy import ForeignKey, Numeric
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from src.app.application.wallets.enums import OperationType
+from src.app.domain.value_objects import OperationType
 from src.app.infrastructure.database.base import Base, BaseTimeStamped
 
 
@@ -12,7 +13,9 @@ class Wallet(Base):
 
     id: Mapped[UUID] = mapped_column(default=uuid4, primary_key=True)
 
-    balance: Mapped[DECIMAL] = mapped_column(default=0, nullable=False)
+    balance: Mapped[Decimal] = mapped_column(
+        Numeric(precision=10, scale=2), default=Decimal("0.00"), nullable=False
+    )
 
     operations: Mapped[list["Operation"]] = relationship(
         back_populates="wallet", cascade="all, delete-orphan"
@@ -30,7 +33,9 @@ class Operation(BaseTimeStamped):
     wallet: Mapped["Wallet"] = relationship(back_populates="operations")
 
     type: Mapped[OperationType] = mapped_column(nullable=False)
-    amount: Mapped[DECIMAL] = mapped_column(default=0, nullable=False)
+    amount: Mapped[Decimal] = mapped_column(
+        Numeric(precision=10, scale=2), default=Decimal("0.00"), nullable=False
+    )
 
     def __repr__(self):
         return f"<Operation(id={self.id})>"

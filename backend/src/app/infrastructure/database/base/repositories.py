@@ -5,41 +5,44 @@ from uuid import UUID
 from sqlalchemy import Select, delete, insert, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.app.common_types import CreateDTOType, ReadDTOType, UpdateDTOType
-from src.app.infrastructure.database.base.models import ModelType
+from src.app.infrastructure.database.base.common_types import EntityType, ModelType
+from src.app.infrastructure.database.base.mappers import AbstractMapper
 
 
-class AbstractSQLAlchemyRepository(
-    ABC, Generic[ModelType, ReadDTOType, CreateDTOType, UpdateDTOType]
-):
+class AbstractSQLAlchemyRepository(ABC, Generic[ModelType, EntityType]):
     model: type[ModelType]
-    read_dto: type[ReadDTOType]
+    entity_class: type[EntityType]
+    mapper: type[AbstractMapper[ModelType, EntityType]]
 
     def __init__(self, session: AsyncSession):
         self._session = session
 
-    async def refresh(self, read_dto: ReadDTOType) -> ReadDTOType:
-        model_instance: ModelType = await self._session.get(self.model, read_dto.id)  # type: ignore[attr-defined]
+    async def refresh(self, entity: EntityType) -> EntityType:
+        model_instance = await self._session.get(self.model, entity.id)
+        assert model_instance is not None
         await self._session.refresh(model_instance)
 
-        return self._to_dto(model_instance)
+        return self.mapper.to_entity(model_instance)
 
-    async def create(self, create_dto: CreateDTOType) -> ReadDTOType:
-        stmt = insert(self.model).values(create_dto.model_dump()).returning(self.model)
+    async def create(self, create_entity: EntityType) -> EntityType:
+        create_data = self.mapper.create_dump(create_entity)
+        stmt = insert(self.model).values(**create_data).returning(self.model)
         result = await self._session.scalars(stmt)
-        return self._to_dto(result.one())
+        return self.mapper.to_entity(result.one())
 
-    async def update(self, pk: int | UUID, update_dto: UpdateDTOType) -> ReadDTOType:
+    async def update(self, pk: int | UUID, update_entity: EntityType) -> EntityType:
+        update_data = self.mapper.create_dump(update_entity)
+
         stmt = (
             update(self.model)
-            .where(self.model.id == pk)  # type: ignore[attr-defined]
-            .values(update_dto.model_dump(exclude_none=True))
+            .where(self.model.id == pk)
+            .values(**update_data)
             .returning(self.model)
         )
         result = await self._session.scalars(stmt)
-        return self._to_dto(result.one())
+        return self.mapper.to_entity(result.one())
 
-    async def get(self, *, with_related: bool = True, **kwargs: Any) -> ReadDTOType | None:
+    async def get(self, *, with_related: bool = True, **kwargs: Any) -> EntityType | None:
         stmt = select(self.model).filter_by(**kwargs)
 
         if with_related:
@@ -48,23 +51,20 @@ class AbstractSQLAlchemyRepository(
         result = await self._session.scalars(stmt)
         model_instance = result.one_or_none()
 
-        return self._to_dto(model_instance) if model_instance else None
+        return self.mapper.to_entity(model_instance) if model_instance else None
 
-    async def filter(self, *, with_related: bool = True, **kwargs: Any) -> list[ReadDTOType]:
+    async def filter(self, *, with_related: bool = True, **kwargs: Any) -> list[EntityType]:
         stmt = select(self.model).filter_by(**kwargs)
 
         if with_related:
             stmt = self._apply_loader_options(stmt)
 
         result = await self._session.scalars(stmt)
-        return [self._to_dto(instance) for instance in result.all()]
+        return [self.mapper.to_entity(instance) for instance in result.all()]
 
     async def delete(self, pk: int | UUID) -> None:
-        stmt = delete(self.model).where(self.model.id == pk)  # type: ignore[attr-defined]
+        stmt = delete(self.model).where(self.model.id == pk)
         await self._session.execute(stmt)
-
-    def _to_dto(self, model: ModelType, from_attributes: bool = True) -> ReadDTOType:
-        return self.read_dto.model_validate(model, from_attributes=from_attributes)
 
     def _apply_loader_options(self, stmt: Select) -> Select:
         return stmt

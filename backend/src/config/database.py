@@ -5,11 +5,9 @@ from pydantic import (
 from pydantic_core import MultiHostUrl
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
-from src.config.app import ENV_FILE
-
 
 class DatabaseConfig(BaseSettings):
-    model_config = SettingsConfigDict(env_prefix="POSTGRES_", env_file=ENV_FILE, extra="ignore")
+    model_config = SettingsConfigDict(env_prefix="POSTGRES_", extra="ignore")
 
     host: str
     port: int = 5432

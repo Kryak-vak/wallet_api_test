@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 
 from src.app.presentation.router import router
-from src.app.config.app import app_config
+from src.config.app import app_config
 
 app = FastAPI(
     title=app_config.project_name,
