@@ -25,7 +25,7 @@
 
 ## GET `/docs`
 
-Документация SwaggetUI
+Документация SwaggerUI
 
 ## POST `/api/v1/wallets/{wallet_id}/operation`
 
