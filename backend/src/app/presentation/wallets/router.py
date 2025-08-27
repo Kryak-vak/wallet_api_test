@@ -28,7 +28,7 @@ async def proccess_operation(
     )
 
 
-@router.post("/{wallet_id}/")
+@router.get("/{wallet_id}/")
 async def get_wallet(
     wallet_id: UUID, service: WalletService = Depends(get_wallet_service)
 ) -> WalletOutSchema:

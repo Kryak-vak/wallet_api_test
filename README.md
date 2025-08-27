@@ -23,7 +23,7 @@
 
 ---
 
-## POST `/docs`
+## GET `/docs`
 
 Документация SwaggetUI
 
