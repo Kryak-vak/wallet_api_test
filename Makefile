@@ -30,10 +30,10 @@ test: build
 
 
 migrations: build
-	$(DOCKER_RUN) poetry run alembic revision --autogenerate
+	$(DOCKER_RUN) uv run alembic revision --autogenerate
 	
 migrate:
-	$(DOCKER_RUN) poetry run alembic upgrade head
+	$(DOCKER_RUN) uv run alembic upgrade head
 
 auto_migrate: migrations migrate
 

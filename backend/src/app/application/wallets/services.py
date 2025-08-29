@@ -30,19 +30,20 @@ class WalletService:
     async def process_operation(
         self, wallet_id: UUID, operation_data: OperationInSchema
     ) -> Operation:
-        wallet = await self.wallet_repo.get(id=wallet_id)
-        if wallet is None:
-            raise WalletNotFoundError(wallet_id)
+        async with self.session.begin():
+            wallet = await self.wallet_repo.get(with_for_update=True, id=wallet_id)
+            if wallet is None:
+                raise WalletNotFoundError(wallet_id)
 
-        operation = Operation(
-            id=uuid4(),
-            type=operation_data.operation_type,
-            amount=Money(operation_data.amount),
-            wallet_id=wallet.id,
-        )
+            operation = Operation(
+                id=uuid4(),
+                type=operation_data.operation_type,
+                amount=Money(operation_data.amount),
+                wallet_id=wallet.id,
+            )
 
-        wallet.apply_operation(operation)
+            wallet.apply_operation(operation)
 
-        wallet = await self.wallet_repo.update(pk=wallet_id, update_entity=wallet)
+            await self.wallet_repo.update(pk=wallet_id, update_entity=wallet)
 
-        return operation
+            return operation

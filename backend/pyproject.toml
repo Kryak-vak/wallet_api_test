@@ -47,10 +47,3 @@ exclude = [
     "src/app/infrastracture/database/migrations.py",
     "**/__init__.py",
 ]
-
-
-[tool.pytest.ini_options]
-pythonpath = [
-    ".",
-]
-asyncio_mode = "auto"
