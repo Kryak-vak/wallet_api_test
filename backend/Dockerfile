@@ -16,6 +16,9 @@ RUN --mount=type=cache,target=/root/.cache/uv \
 
 COPY ./src/ ./src/
 COPY ./tests/ ./tests/
+COPY ./migrations/ ./migrations/
+COPY ./alembic.ini ./alembic.ini
+COPY ./pytest.ini ./pytest.ini
 
 # RUN --mount=type=cache,target=/root/.cache/uv \
 #     uv sync --locked --no-dev

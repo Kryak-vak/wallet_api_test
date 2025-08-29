@@ -13,7 +13,14 @@ from src.app.presentation.wallets.schemas import (
 router = APIRouter(prefix="/wallets", tags=["wallets"])
 
 
-@router.post("/{wallet_id}/operation")
+@router.post(
+    "/{wallet_id}/operation",
+    response_model=OperationOutSchema,
+    responses={
+        404: {"description": "Wallet not found"},
+        200: {"description": "Operation processed successfully"},
+    }
+)
 async def proccess_operation(
     wallet_id: UUID,
     operation_data: OperationInSchema,
@@ -28,7 +35,14 @@ async def proccess_operation(
     )
 
 
-@router.post("/{wallet_id}/")
+@router.get(
+    "/{wallet_id}/",
+    response_model=WalletOutSchema,
+    responses={
+        404: {"description": "Wallet not found"},
+        200: {"description": "Wallet retrieved successfully"},
+    }
+)
 async def get_wallet(
     wallet_id: UUID, service: WalletService = Depends(get_wallet_service)
 ) -> WalletOutSchema:
