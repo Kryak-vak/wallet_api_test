@@ -42,22 +42,38 @@ class AbstractSQLAlchemyRepository(ABC, Generic[ModelType, EntityType]):
         result = await self._session.scalars(stmt)
         return self.mapper.to_entity(result.one())
 
-    async def get(self, *, with_related: bool = True, **kwargs: Any) -> EntityType | None:
+    async def get(
+            self, *,
+            with_related: bool = True,
+            with_for_update: bool = False,
+            **kwargs: Any
+        ) -> EntityType | None:
         stmt = select(self.model).filter_by(**kwargs)
 
         if with_related:
             stmt = self._apply_loader_options(stmt)
+        
+        if with_for_update:
+            stmt = stmt.with_for_update()
 
         result = await self._session.scalars(stmt)
         model_instance = result.one_or_none()
 
         return self.mapper.to_entity(model_instance) if model_instance else None
 
-    async def filter(self, *, with_related: bool = True, **kwargs: Any) -> list[EntityType]:
+    async def filter(
+            self, *,
+            with_related: bool = True,
+            with_for_update: bool = False,
+            **kwargs: Any
+            ) -> list[EntityType]:
         stmt = select(self.model).filter_by(**kwargs)
 
         if with_related:
             stmt = self._apply_loader_options(stmt)
+        
+        if with_for_update:
+            stmt = stmt.with_for_update()
 
         result = await self._session.scalars(stmt)
         return [self.mapper.to_entity(instance) for instance in result.all()]
